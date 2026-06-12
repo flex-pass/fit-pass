@@ -21,6 +21,15 @@ interface AuthContextType {
   session: UserSession | null;
   role: UserRole;
   loginAs: (role: UserRole) => void;
+  loginUser: (name: string, email: string, role: UserRole, extra?: Partial<UserSession>) => void;
+  registerUser: (details: {
+    name: string;
+    phone: string;
+    email: string;
+    city: string;
+    planType: 'basic' | 'standard' | 'premium';
+    billingCycle: 'monthly' | 'quarterly' | 'yearly';
+  }) => void;
   logout: () => void;
   updateCredits: (amount: number) => void;
 }
@@ -69,8 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<UserSession | null>(null);
 
   useEffect(() => {
-    // Default to user role on client load for developer testing convenience
-    const savedRole = localStorage.getItem('flexpass-mock-role') as UserRole || 'user';
+    // Default to public role on client load
+    const savedRole = localStorage.getItem('flexpass-mock-role') as UserRole || 'public';
     setRole(savedRole);
     setSession(mockSessions[savedRole]);
   }, []);
@@ -79,6 +88,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('flexpass-mock-role', newRole);
     setRole(newRole);
     setSession(mockSessions[newRole]);
+  };
+
+  const loginUser = (name: string, email: string, userRole: UserRole, extra?: Partial<UserSession>) => {
+    const defaultCredits = userRole === 'user' ? 30 : undefined;
+    const newSession: UserSession = {
+      id: `session-${Math.random().toString(36).substr(2, 9)}`,
+      name,
+      phone: '+91 99999 99999',
+      email,
+      role: userRole,
+      creditsBalance: defaultCredits,
+      planType: userRole === 'user' ? 'basic' : 'none',
+      ...extra,
+    };
+    localStorage.setItem('flexpass-mock-role', userRole);
+    setRole(userRole);
+    setSession(newSession);
+  };
+
+  const registerUser = (details: {
+    name: string;
+    phone: string;
+    email: string;
+    city: string;
+    planType: 'basic' | 'standard' | 'premium';
+    billingCycle: 'monthly' | 'quarterly' | 'yearly';
+  }) => {
+    const creditsMap = {
+      basic: 30,
+      standard: 55,
+      premium: 100,
+    };
+    const newSession: UserSession = {
+      id: `user-${Math.random().toString(36).substr(2, 9)}`,
+      name: details.name,
+      phone: details.phone,
+      email: details.email,
+      role: 'user',
+      creditsBalance: creditsMap[details.planType],
+      planType: details.planType,
+      city: details.city,
+    };
+    localStorage.setItem('flexpass-mock-role', 'user');
+    setRole('user');
+    setSession(newSession);
   };
 
   const logout = () => {
@@ -95,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, role, loginAs, logout, updateCredits }}>
+    <AuthContext.Provider value={{ session, role, loginAs, loginUser, registerUser, logout, updateCredits }}>
       {children}
     </AuthContext.Provider>
   );

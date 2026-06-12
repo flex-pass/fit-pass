@@ -48,8 +48,8 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* FlexPass Color Palette */
-  --color-brand-primary: #1A6B8A;
-  --color-brand-secondary: #2E86AB;
+  --color-brand-primary: #E11D48;
+  --color-brand-secondary: #BE123C;
   --color-brand-accent: #28A745;
   --color-brand-warning: #FD7E14;
   --color-brand-error: #DC3545;

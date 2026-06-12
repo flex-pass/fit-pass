@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/lib/auth';
-import Navbar from '@/components/navbar';
-import Footer from '@/components/footer';
+import LayoutProvider from '@/components/layout/layout-provider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,12 +20,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} font-sans h-full antialiased`}>
+    <html lang="en" className={`dark ${inter.variable} font-sans h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 transition-colors">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <Footer />
+          <LayoutProvider>
+            {children}
+          </LayoutProvider>
         </AuthProvider>
       </body>
     </html>

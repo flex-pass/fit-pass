@@ -10,21 +10,22 @@ export default function Navbar() {
   const pathname = usePathname();
   const { session, role, loginAs } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
-  const rolesList: { name: string; key: UserRole; color: string }[] = [
-    { name: 'Public Visitor', key: 'public', color: 'bg-zinc-500 text-white' },
-    { name: 'User (Rahul K.)', key: 'user', color: 'bg-brand-primary text-white' },
-    { name: 'Gym Owner', key: 'gym-owner', color: 'bg-brand-accent text-white' },
-    { name: 'Corporate HR', key: 'corporate-hr', color: 'bg-indigo-600 text-white' },
-    { name: 'Super Admin', key: 'admin', color: 'bg-brand-warning text-black font-semibold' },
-  ];
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const getLinks = () => {
     switch (role) {
       case 'user':
         return [
-          { name: 'Dashboard', href: '/dashboard' },
+          { name: 'Dashboard', href: '/user/dashboard' },
           { name: 'Explore Gyms', href: '/explore' },
           { name: 'Credits Wallet', href: '/wallet' },
           { name: 'Subscription', href: '/subscription' },
@@ -58,43 +59,10 @@ export default function Navbar() {
   const links = getLinks();
 
   return (
-    <div className="w-full sticky top-0 z-50">
-      {/* Dev Environment Sandbox Banner */}
-      {showRoleSwitcher && (
-        <div className="bg-zinc-900 border-b border-zinc-800 text-xs py-2 px-4 flex flex-wrap items-center justify-between gap-2 text-zinc-300">
-          <div className="flex items-center gap-1.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-zinc-100">FlexPass Frontend Sandbox</span>
-            <span className="hidden sm:inline text-zinc-500">|</span>
-            <span className="hidden sm:inline text-zinc-400">Preview different portals instantly:</span>
-          </div>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {rolesList.map(r => (
-              <button
-                key={r.key}
-                onClick={() => loginAs(r.key)}
-                className={`px-2 py-0.5 rounded text-[10px] transition-all cursor-pointer ${
-                  role === r.key
-                    ? `${r.color} ring-2 ring-white/20 scale-105 shadow-md`
-                    : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
-                }`}
-              >
-                {r.name}
-              </button>
-            ))}
-            <button
-              onClick={() => setShowRoleSwitcher(false)}
-              className="ml-2 text-zinc-500 hover:text-zinc-300 font-bold"
-              title="Hide Banner"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="w-full fixed top-0 z-50">
 
       {/* Main Navbar */}
-      <header className="bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <header className={`transition-all duration-300 ${scrolled ? 'bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 shadow-sm py-0' : 'bg-transparent border-b-transparent py-2'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -103,7 +71,7 @@ export default function Navbar() {
                 <div className="p-2 bg-brand-primary rounded-lg text-white">
                   <Dumbbell className="h-5 w-5" />
                 </div>
-                <span>FLEX<span className="text-zinc-950 dark:text-zinc-50 font-medium">PASS</span></span>
+                <span>FLEX<span className={`font-medium transition-colors ${scrolled ? 'text-zinc-950 dark:text-zinc-50' : 'text-zinc-950 dark:text-zinc-50 md:text-white'}`}>PASS</span></span>
               </Link>
             </div>
 
@@ -118,7 +86,9 @@ export default function Navbar() {
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive
                         ? 'text-brand-primary bg-zinc-100 dark:bg-zinc-900 font-semibold'
-                        : 'text-zinc-600 dark:text-zinc-300 hover:text-brand-primary hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                        : scrolled 
+                          ? 'text-zinc-600 dark:text-zinc-300 hover:text-brand-primary hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                          : 'text-zinc-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     {link.name}
@@ -149,16 +119,16 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
-                  <button onClick={() => loginAs('user')} className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-brand-primary px-3 py-2 rounded-md transition-colors cursor-pointer">
+                  <Link href="/login" className={`text-sm font-medium px-3 py-2 rounded-md transition-colors cursor-pointer ${scrolled ? 'text-zinc-600 dark:text-zinc-300 hover:text-brand-primary' : 'text-zinc-300 hover:text-white'}`}>
                     Login
-                  </button>
-                  <button
-                    onClick={() => loginAs('user')}
+                  </Link>
+                  <Link
+                    href="/register"
                     className="flex items-center gap-1.5 bg-brand-primary hover:bg-brand-secondary text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:shadow transition-all cursor-pointer"
                   >
                     <span>Start Free Trial</span>
                     <ArrowRight className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -208,24 +178,20 @@ export default function Navbar() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => {
-                      loginAs('user');
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full text-center text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-brand-primary py-2 cursor-pointer"
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-brand-primary py-2 cursor-pointer block"
                   >
                     Login
-                  </button>
-                  <button
-                    onClick={() => {
-                      loginAs('user');
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full text-center bg-brand-primary hover:bg-brand-secondary text-white py-2.5 rounded-lg text-sm font-semibold cursor-pointer"
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full text-center bg-brand-primary hover:bg-brand-secondary text-white py-2.5 rounded-lg text-sm font-semibold cursor-pointer block"
                   >
                     Start Free Trial
-                  </button>
+                  </Link>
                 </div>
               )}
             </div>
