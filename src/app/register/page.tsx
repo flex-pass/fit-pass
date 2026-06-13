@@ -82,23 +82,29 @@ export default function RegisterPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !email || !city || !password) {
       setError('Please fill in all fields.');
       return;
     }
     
-    registerUser({
+    setError('');
+    const result = await registerUser({
       name,
       phone,
       email,
       city,
       planType,
       billingCycle,
+      password,
     });
     
-    router.push('/user/dashboard');
+    if (result.success) {
+      router.push('/user/dashboard');
+    } else {
+      setError(result.message || 'Registration failed.');
+    }
   };
 
   return (

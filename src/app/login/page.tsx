@@ -13,15 +13,29 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !password) {
-      setError('Please enter both name and password.');
+      setError('Please enter both name/email and password.');
       return;
     }
-    // Mock login: Name acts as user session name
-    loginUser(name, `${name.toLowerCase().replace(/\s+/g, '')}@example.com`, 'user');
-    router.push('/user/dashboard');
+    
+    // Normalize input to email format if it's just a username
+    const emailInput = name.includes('@') ? name : `${name.toLowerCase().replace(/\s+/g, '')}@example.com`;
+    
+    setError('');
+    const result = await loginUser(emailInput, password);
+    if (result.success) {
+      if (result.role === 'admin') {
+        router.push('/superadmin/dashboard');
+      } else if (result.role === 'gym-owner') {
+        router.push('/gym-owner/dashboard');
+      } else {
+        router.push('/user/dashboard');
+      }
+    } else {
+      setError(result.message || 'Invalid credentials');
+    }
   };
 
   return (

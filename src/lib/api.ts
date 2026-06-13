@@ -1,4 +1,5 @@
 // Centralized API client for FlexPass
+import apiClient from './api-client';
 
 export interface Gym {
   id: string;
@@ -153,3 +154,81 @@ export function isPeakHour(gym: Gym): boolean {
 export function getCurrentCreditCost(gym: Gym): number {
   return isPeakHour(gym) ? gym.peak_credit_cost : gym.offpeak_credit_cost;
 }
+
+// REST Backend Services
+export const gymService = {
+  async getNearby(lat: number, lng: number, radius?: number) {
+    const response = await apiClient.get('/gyms/nearby', {
+      params: { lat, lng, radius }
+    });
+    return response.data;
+  },
+  async getById(id: string) {
+    const response = await apiClient.get(`/gyms/${id}`);
+    return response.data;
+  },
+  async getCreditCost(id: string) {
+    const response = await apiClient.get(`/gyms/${id}/credit-cost`);
+    return response.data;
+  },
+  async create(gymData: any) {
+    const response = await apiClient.post('/gyms', gymData);
+    return response.data;
+  },
+  async update(id: string, gymData: any) {
+    const response = await apiClient.put(`/gyms/${id}`, gymData);
+    return response.data;
+  },
+  async toggleKillSwitch(id: string, kill_switch: boolean) {
+    const response = await apiClient.patch(`/gyms/${id}/kill-switch`, { kill_switch });
+    return response.data;
+  }
+};
+
+export const checkinService = {
+  async generateQR(gymId: string, lat: number, lng: number) {
+    const response = await apiClient.post('/checkin/generate-qr', {
+      gym_id: gymId,
+      user_lat: lat,
+      user_lng: lng
+    });
+    return response.data;
+  },
+  async validateQR(qrToken: string) {
+    const response = await apiClient.post('/checkin/validate', {
+      qr_token: qrToken
+    });
+    return response.data;
+  }
+};
+
+export const creditsService = {
+  async getBalance() {
+    const response = await apiClient.get('/credits/balance');
+    return response.data;
+  },
+  async getHistory() {
+    const response = await apiClient.get('/credits/history');
+    return response.data;
+  },
+  async purchaseTopup(amount: number, description?: string) {
+    const response = await apiClient.post('/credits/topup', {
+      amount,
+      type: 'topup',
+      description
+    });
+    return response.data;
+  }
+};
+
+export const adminService = {
+  async approveGym(id: string) {
+    const response = await apiClient.patch(`/admin/gyms/${id}/approve`);
+    return response.data;
+  },
+  async getDashboard() {
+    const response = await apiClient.get('/admin/dashboard');
+    return response.data;
+  }
+};
+

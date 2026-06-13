@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '@/services/auth.service';
 
 export type UserRole = 'public' | 'user' | 'gym-owner' | 'corporate-hr' | 'admin';
 
@@ -20,8 +21,9 @@ export interface UserSession {
 interface AuthContextType {
   session: UserSession | null;
   role: UserRole;
+  loading: boolean;
   loginAs: (role: UserRole) => void;
-  loginUser: (name: string, email: string, role: UserRole, extra?: Partial<UserSession>) => void;
+  loginUser: (email: string, password?: string) => Promise<any>;
   registerUser: (details: {
     name: string;
     phone: string;
@@ -29,7 +31,8 @@ interface AuthContextType {
     city: string;
     planType: 'basic' | 'standard' | 'premium';
     billingCycle: 'monthly' | 'quarterly' | 'yearly';
-  }) => void;
+    password?: string;
+  }) => Promise<any>;
   logout: () => void;
   updateCredits: (amount: number) => void;
 }
@@ -76,67 +79,119 @@ const mockSessions: Record<UserRole, UserSession | null> = {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<UserRole>('public');
   const [session, setSession] = useState<UserSession | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Default to public role on client load
-    const savedRole = localStorage.getItem('flexpass-mock-role') as UserRole || 'public';
-    setRole(savedRole);
-    setSession(mockSessions[savedRole]);
+    // Load active session on client mount
+    const savedRole = localStorage.getItem('flexpass-mock-role') as UserRole;
+    const currentUser = authService.getCurrentUser();
+
+    if (currentUser) {
+      // Map API role to UI role
+      let uiRole: UserRole = 'user';
+      const backendRole = currentUser.role?.toUpperCase();
+      if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
+      else if (backendRole === 'ADMIN' || backendRole === 'SUPERADMIN') uiRole = 'admin';
+
+      setRole(uiRole);
+      setSession({
+        id: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        phone: currentUser.phone_number || '+91 99999 99999',
+        role: uiRole,
+        creditsBalance: currentUser.credits_balance ?? 0,
+        planType: currentUser.plan_type ? currentUser.plan_type.toLowerCase() as any : 'none',
+        city: currentUser.city || 'Noida',
+      });
+    } else if (savedRole) {
+      setRole(savedRole);
+      setSession(mockSessions[savedRole]);
+    } else {
+      setRole('public');
+      setSession(null);
+    }
+    setLoading(false);
   }, []);
 
   const loginAs = (newRole: UserRole) => {
+    authService.logout(); // Clear any database sessions
     localStorage.setItem('flexpass-mock-role', newRole);
     setRole(newRole);
     setSession(mockSessions[newRole]);
   };
 
-  const loginUser = (name: string, email: string, userRole: UserRole, extra?: Partial<UserSession>) => {
-    const defaultCredits = userRole === 'user' ? 30 : undefined;
-    const newSession: UserSession = {
-      id: `session-${Math.random().toString(36).substr(2, 9)}`,
-      name,
-      phone: '+91 99999 99999',
-      email,
-      role: userRole,
-      creditsBalance: defaultCredits,
-      planType: userRole === 'user' ? 'basic' : 'none',
-      ...extra,
-    };
-    localStorage.setItem('flexpass-mock-role', userRole);
-    setRole(userRole);
-    setSession(newSession);
+  const loginUser = async (email: string, password?: string) => {
+    setLoading(true);
+    try {
+      const response = await authService.login({ email, password });
+      if (response?.success && response?.data) {
+        const user = response.data.user;
+        let uiRole: UserRole = 'user';
+        const backendRole = user.role?.toUpperCase();
+        if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
+        else if (backendRole === 'ADMIN' || backendRole === 'SUPERADMIN') uiRole = 'admin';
+
+        localStorage.removeItem('flexpass-mock-role'); // Remove mock role on success
+        setRole(uiRole);
+        setSession({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone_number || '+91 99999 99999',
+          role: uiRole,
+          creditsBalance: user.credits_balance ?? 0,
+          planType: user.plan_type ? user.plan_type.toLowerCase() as any : 'none',
+          city: user.city || 'Noida',
+        });
+        return { success: true, role: uiRole };
+      }
+      return { success: false, message: response?.message || 'Login failed' };
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Login error occurred';
+      return { success: false, message: msg };
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const registerUser = (details: {
+  const registerUser = async (details: {
     name: string;
     phone: string;
     email: string;
     city: string;
     planType: 'basic' | 'standard' | 'premium';
     billingCycle: 'monthly' | 'quarterly' | 'yearly';
+    password?: string;
   }) => {
-    const creditsMap = {
-      basic: 30,
-      standard: 55,
-      premium: 100,
-    };
-    const newSession: UserSession = {
-      id: `user-${Math.random().toString(36).substr(2, 9)}`,
-      name: details.name,
-      phone: details.phone,
-      email: details.email,
-      role: 'user',
-      creditsBalance: creditsMap[details.planType],
-      planType: details.planType,
-      city: details.city,
-    };
-    localStorage.setItem('flexpass-mock-role', 'user');
-    setRole('user');
-    setSession(newSession);
+    setLoading(true);
+    try {
+      const res = await authService.register({
+        name: details.name,
+        email: details.email,
+        phone_number: details.phone,
+        city: details.city,
+        password: details.password || '123456',
+        role: 'USER',
+      });
+
+      if (res?.success) {
+        // Automatically login the registered user
+        return await loginUser(details.email, details.password || '123456');
+      }
+      return { success: false, message: res?.message || 'Registration failed' };
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Registration error';
+      return { success: false, message: msg };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
-    loginAs('public');
+    authService.logout();
+    setRole('public');
+    setSession(null);
   };
 
   const updateCredits = (amount: number) => {
@@ -149,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, role, loginAs, loginUser, registerUser, logout, updateCredits }}>
+    <AuthContext.Provider value={{ session, role, loading, loginAs, loginUser, registerUser, logout, updateCredits }}>
       {children}
     </AuthContext.Provider>
   );
