@@ -15,8 +15,7 @@ export default function LayoutProvider({ children }: { children: React.ReactNode
     '/admin',
     '/gym-owner',
     '/corporate',
-    '/login',
-    '/register'
+    '/login'
   ];
 
   const shouldHideLayout = hideLayoutPaths.some(path => pathname?.startsWith(path));

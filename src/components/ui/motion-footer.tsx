@@ -21,19 +21,19 @@ const STYLES = `
   font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   
-  /* Dynamic Variables using standard shadcn/tailwind v4 tokens */
-  --pill-bg-1: color-mix(in oklch, var(--foreground) 3%, transparent);
-  --pill-bg-2: color-mix(in oklch, var(--foreground) 1%, transparent);
-  --pill-shadow: color-mix(in oklch, var(--background) 50%, transparent);
-  --pill-highlight: color-mix(in oklch, var(--foreground) 10%, transparent);
-  --pill-inset-shadow: color-mix(in oklch, var(--background) 80%, transparent);
-  --pill-border: color-mix(in oklch, var(--foreground) 8%, transparent);
+  /* Dynamic Variables using hardcoded colors to avoid shadcn token parsing errors */
+  --pill-bg-1: color-mix(in srgb, white 3%, transparent);
+  --pill-bg-2: color-mix(in srgb, white 1%, transparent);
+  --pill-shadow: color-mix(in srgb, black 50%, transparent);
+  --pill-highlight: color-mix(in srgb, white 10%, transparent);
+  --pill-inset-shadow: color-mix(in srgb, black 80%, transparent);
+  --pill-border: color-mix(in srgb, white 8%, transparent);
   
-  --pill-bg-1-hover: color-mix(in oklch, var(--foreground) 8%, transparent);
-  --pill-bg-2-hover: color-mix(in oklch, var(--foreground) 2%, transparent);
-  --pill-border-hover: color-mix(in oklch, var(--foreground) 20%, transparent);
-  --pill-shadow-hover: color-mix(in oklch, var(--background) 70%, transparent);
-  --pill-highlight-hover: color-mix(in oklch, var(--foreground) 20%, transparent);
+  --pill-bg-1-hover: color-mix(in srgb, white 8%, transparent);
+  --pill-bg-2-hover: color-mix(in srgb, white 2%, transparent);
+  --pill-border-hover: color-mix(in srgb, white 20%, transparent);
+  --pill-shadow-hover: color-mix(in srgb, black 70%, transparent);
+  --pill-highlight-hover: color-mix(in srgb, white 20%, transparent);
 }
 
 @keyframes footer-breathe {
@@ -68,8 +68,8 @@ const STYLES = `
 .footer-bg-grid {
   background-size: 60px 60px;
   background-image: 
-    linear-gradient(to right, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, white 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, white 3%, transparent) 1px, transparent 1px);
   mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
   -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
 }
@@ -78,8 +78,8 @@ const STYLES = `
 .footer-aurora {
   background: radial-gradient(
     circle at 50% 50%, 
-    color-mix(in oklch, var(--primary) 15%, transparent) 0%, 
-    color-mix(in oklch, var(--secondary) 15%, transparent) 40%, 
+    color-mix(in srgb, #E11D48 15%, transparent) 0%, 
+    color-mix(in srgb, #BE123C 15%, transparent) 40%, 
     transparent 70%
   );
 }
@@ -103,7 +103,7 @@ const STYLES = `
   box-shadow: 
       0 20px 40px -10px var(--pill-shadow-hover), 
       inset 0 1px 1px var(--pill-highlight-hover);
-  color: var(--foreground);
+  color: white;
 }
 
 /* Giant Background Text Masking */
@@ -113,19 +113,19 @@ const STYLES = `
   font-weight: 900;
   letter-spacing: -0.05em;
   color: transparent;
-  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 5%, transparent);
-  background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 10%, transparent) 0%, transparent 60%);
+  -webkit-text-stroke: 1px color-mix(in srgb, white 5%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, white 10%, transparent) 0%, transparent 60%);
   -webkit-background-clip: text;
   background-clip: text;
 }
 
 /* Metallic Text Glow */
 .footer-text-glow {
-  background: linear-gradient(180deg, var(--foreground) 0%, color-mix(in oklch, var(--foreground) 40%, transparent) 100%);
+  background: linear-gradient(180deg, white 0%, color-mix(in srgb, white 40%, transparent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0px 0px 20px color-mix(in oklch, var(--foreground) 15%, transparent));
+  filter: drop-shadow(0px 0px 20px color-mix(in srgb, white 15%, transparent));
 }
 `;
 
@@ -235,11 +235,10 @@ export function CinematicFooter() {
       // Background Parallax
       gsap.fromTo(
         giantTextRef.current,
-        { y: "10vh", scale: 0.8, opacity: 0 },
+        { y: "10vh", scale: 0.9 },
         {
           y: "0vh",
           scale: 1,
-          opacity: 1,
           ease: "power1.out",
           scrollTrigger: {
             trigger: wrapperRef.current,
@@ -253,15 +252,14 @@ export function CinematicFooter() {
       // Staggered Content Reveal
       gsap.fromTo(
         [headingRef.current, linksRef.current],
-        { y: 50, opacity: 0 },
+        { y: 30 },
         {
           y: 0,
-          opacity: 1,
           stagger: 0.15,
           ease: "power3.out",
           scrollTrigger: {
             trigger: wrapperRef.current,
-            start: "top 40%",
+            start: "top 80%",
             end: "bottom bottom",
             scrub: 1,
           },

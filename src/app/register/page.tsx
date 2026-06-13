@@ -102,22 +102,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col justify-start pt-32 pb-20 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background blobs */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-brand-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Progress Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center z-10">
-        <Link href="/" className="inline-flex items-center gap-2 font-bold text-2xl text-brand-primary tracking-tight">
-          <div className="p-2 bg-brand-primary rounded-xl text-white">
-            <Dumbbell className="h-6 w-6" />
-          </div>
-          <span>FLEX<span className="text-zinc-950 dark:text-zinc-50 font-medium">PASS</span></span>
-        </Link>
-        
         {/* Step Indicator */}
-        <div className="mt-8 flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-4">
           <div className="flex items-center">
             <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
               step >= 1 ? 'bg-brand-primary text-white ring-4 ring-brand-primary/20' : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-500'
@@ -148,8 +141,7 @@ export default function RegisterPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-5xl z-10 px-4">
-        <div className="bg-white dark:bg-zinc-900 py-8 px-4 shadow-xl rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 sm:px-10">
-          
+        <div>
           {/* STEP 1: PLAN SELECTION */}
           {step === 1 && (
             <div className="space-y-6">
@@ -163,14 +155,14 @@ export default function RegisterPage() {
                   <div
                     key={p.id}
                     onClick={() => setPlanType(p.id)}
-                    className={`relative rounded-2xl p-6 border-2 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                    className={`relative rounded-3xl p-6 border-2 flex flex-col justify-between cursor-pointer transition-all duration-300 hover:shadow-lg ${
                       planType === p.id
-                        ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 shadow-md scale-[1.02]'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'
+                        ? 'border-brand-primary bg-white dark:bg-zinc-900 ring-2 ring-brand-primary/25 shadow-xl scale-[1.02]'
+                        : 'border-zinc-200 dark:border-zinc-850 bg-white dark:bg-zinc-900 shadow-sm'
                     }`}
                   >
                     {p.popular && (
-                      <span className="absolute -top-3 right-4 bg-brand-primary text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shadow-sm">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-primary text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shadow-sm">
                         Most Popular
                       </span>
                     )}
@@ -188,15 +180,15 @@ export default function RegisterPage() {
                         <span className="text-xs text-zinc-500 font-semibold">{getCycleLabel(billingCycle)}</span>
                       </div>
 
-                      <div className="bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-cyan-400 rounded-xl p-3 flex items-center justify-between text-xs font-bold">
+                      <div className="bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-xl p-3 flex items-center justify-between text-xs font-bold">
                         <span>Monthly Credits</span>
                         <span className="text-sm">{p.credits} Credits</span>
                       </div>
 
-                      <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 pt-2 border-t border-zinc-100 dark:border-zinc-850">
+                      <ul className="space-y-2.5 text-xs text-zinc-600 dark:text-zinc-400 pt-4 border-t border-zinc-100 dark:border-zinc-850">
                         {p.features.map((feat, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <Check className="h-4 w-4 text-brand-accent shrink-0 mt-0.5" />
+                            <Check className="h-4 w-4 text-brand-primary shrink-0 mt-0.5" />
                             <span>{feat}</span>
                           </li>
                         ))}
@@ -219,7 +211,7 @@ export default function RegisterPage() {
               <div className="flex justify-end pt-6">
                 <button
                   onClick={handleNextStep}
-                  className="px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white text-sm font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 bg-brand-primary hover:bg-brand-secondary text-white text-sm font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer animate-pulse"
                 >
                   <span>Continue to Billing Cycle</span>
                   <ArrowRight className="h-4 w-4" />
@@ -230,7 +222,7 @@ export default function RegisterPage() {
 
           {/* STEP 2: BILLING CYCLE */}
           {step === 2 && (
-            <div className="space-y-6 max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 shadow-xl rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 max-w-2xl mx-auto space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-white">Select Billing Frequency</h2>
                 <p className="text-sm text-zinc-500">Save up to 25% by choosing a quarterly or annual membership cycle.</p>
@@ -248,13 +240,13 @@ export default function RegisterPage() {
                     className={`relative rounded-xl p-5 border-2 cursor-pointer transition-all duration-300 hover:shadow ${
                       billingCycle === cycle.id
                         ? 'border-brand-primary bg-brand-primary/5 dark:bg-brand-primary/10 shadow-sm'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'
+                        : 'border-zinc-200 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-bold text-sm text-zinc-900 dark:text-white">{cycle.name}</h3>
                       <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                        cycle.id === 'monthly' ? 'bg-zinc-100 text-zinc-600' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400'
+                        cycle.id === 'monthly' ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-350' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400'
                       }`}>
                         {cycle.discount}
                       </span>
@@ -265,7 +257,7 @@ export default function RegisterPage() {
               </div>
 
               {/* Selected summary */}
-              <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800/60 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+              <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-850 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
                 <div>
                   <span className="text-[10px] text-zinc-400 uppercase tracking-wider block font-bold">Your Selected Plan</span>
                   <span className="text-base font-extrabold text-zinc-900 dark:text-white capitalize">
@@ -301,7 +293,7 @@ export default function RegisterPage() {
 
           {/* STEP 3: ACCOUNT CREATION */}
           {step === 3 && (
-            <div className="space-y-6 max-w-xl mx-auto">
+            <div className="bg-white dark:bg-zinc-900 py-8 px-6 sm:px-10 shadow-xl rounded-3xl border border-zinc-200/60 dark:border-zinc-800/60 max-w-xl mx-auto space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-white">Create your account</h2>
                 <p className="text-sm text-zinc-500">Provide registration details to finalize subscription setup.</p>

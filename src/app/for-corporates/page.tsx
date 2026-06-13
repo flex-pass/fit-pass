@@ -17,12 +17,12 @@ export default function ForCorporates() {
   return (
     <div className="w-full flex flex-col items-center">
       {/* Hero */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
-        <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 px-3.5 py-1.5 rounded-full border border-indigo-200/50">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 text-center space-y-6">
+        <span className="text-xs font-bold uppercase tracking-wider text-brand-primary bg-brand-primary/10 dark:bg-brand-primary/20 px-3.5 py-1.5 rounded-full border border-brand-primary/20">
           FlexPass Enterprise
         </span>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-zinc-900 dark:text-white max-w-3xl mx-auto leading-tight">
-          Flexible fitness benefits for <span className="text-indigo-600">modern teams</span>
+          Flexible fitness benefits for <span className="text-brand-primary">modern teams</span>
         </h1>
         <p className="text-base sm:text-lg text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
           Equip your company with access to 75+ Noida partner gyms. Track health analytics and cut employee wellness costs.
@@ -31,7 +31,7 @@ export default function ForCorporates() {
         <div className="flex justify-center gap-4 pt-4">
           <button
             onClick={() => loginAs('corporate-hr')}
-            className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/20 transition-all flex items-center gap-2 cursor-pointer"
+            className="px-8 py-4 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-xl shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2 cursor-pointer"
           >
             <span>Request Demo Pitch</span>
             <ArrowRight className="h-5 w-5" />
@@ -45,7 +45,7 @@ export default function ForCorporates() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((b, idx) => (
               <div key={idx} className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 p-6 rounded-2xl shadow-sm">
-                <div className="h-10 w-10 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 rounded-lg flex items-center justify-center mb-4">
+                <div className="h-10 w-10 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-lg flex items-center justify-center mb-4">
                   <CheckCircle className="h-5 w-5" />
                 </div>
                 <h3 className="font-bold text-base text-zinc-900 dark:text-white mb-2">{b.title}</h3>
@@ -60,7 +60,7 @@ export default function ForCorporates() {
       <section className="w-full max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 shadow-xl space-y-6">
           <div className="text-center space-y-2">
-            <Building className="h-8 w-8 text-indigo-600 mx-auto" />
+            <Building className="h-8 w-8 text-brand-primary mx-auto" />
             <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Request Free Corporate Pass</h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Submit your corporate email address to receive custom tier rates.
@@ -74,7 +74,7 @@ export default function ForCorporates() {
                 required
                 type="text"
                 placeholder="e.g. Infosys, TCS, Wipro"
-                className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-600"
+                className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
               />
             </div>
             <div>
@@ -83,13 +83,13 @@ export default function ForCorporates() {
                 required
                 type="email"
                 placeholder="hr@yourcompany.com"
-                className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-600"
+                className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-850 bg-zinc-50 dark:bg-zinc-950 text-sm focus:outline-none focus:ring-1 focus:ring-brand-primary"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-750 text-white font-bold rounded-xl text-center shadow transition-colors cursor-pointer"
+              className="w-full py-3.5 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-xl text-center shadow transition-colors cursor-pointer"
             >
               Get Sandbox Access
             </button>

@@ -22,7 +22,7 @@ export default function GymsDirectory() {
   const amenitiesList = ['weights', 'cardio', 'pool', 'shower', 'sauna', 'yoga mat'];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
       {/* Header */}
       <div className="space-y-2 mb-10 text-center sm:text-left">
         <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white">Explore Partner Gyms</h1>
