@@ -22,9 +22,21 @@ export const authService = {
     });
     
     if (response.data?.success && response.data?.data?.token) {
-      const { token, user } = response.data.data;
+      const { token } = response.data.data;
       localStorage.setItem('flexpass-auth-token', token);
-      localStorage.setItem('flexpass-auth-user', JSON.stringify(user));
+      
+      // Fetch user profile from /auth/me API immediately
+      const meResponse = await this.getMe();
+      if (meResponse?.success && meResponse?.data?.user) {
+        localStorage.setItem('flexpass-auth-user', JSON.stringify(meResponse.data.user));
+        return {
+          success: true,
+          data: {
+            token,
+            user: meResponse.data.user
+          }
+        };
+      }
     }
     return response.data;
   },
@@ -42,10 +54,28 @@ export const authService = {
     return response.data;
   },
 
-  logout() {
+  async getMe() {
+    const response = await apiClient.get('/auth/me');
+    return response.data;
+  },
+
+  async logout() {
+    const token = this.getToken();
     localStorage.removeItem('flexpass-auth-token');
     localStorage.removeItem('flexpass-auth-user');
     localStorage.removeItem('flexpass-mock-role');
+
+    if (token) {
+      try {
+        await apiClient.post('/auth/logout', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      } catch (error) {
+        console.error('Logout API call failed:', error);
+      }
+    }
   },
 
   getCurrentUser() {

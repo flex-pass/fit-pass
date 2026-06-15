@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/auth.service';
 
-export type UserRole = 'public' | 'user' | 'gym-owner' | 'corporate-hr' | 'admin';
+export type UserRole = 'public' | 'user' | 'gym-owner' | 'corporate-hr' | 'admin' | 'superadmin';
 
 export interface UserSession {
   id: string;
@@ -69,10 +69,17 @@ const mockSessions: Record<UserRole, UserSession | null> = {
   },
   admin: {
     id: 'admin-001',
-    name: 'Super Admin',
+    name: 'Gym Admin',
     phone: '+91 90000 00000',
     email: 'admin@flexpass.in',
     role: 'admin',
+  },
+  superadmin: {
+    id: 'superadmin-001',
+    name: 'Super Admin',
+    phone: '+91 90000 00000',
+    email: 'superadmin@flexpass.in',
+    role: 'superadmin',
   },
 };
 
@@ -91,7 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       let uiRole: UserRole = 'user';
       const backendRole = currentUser.role?.toUpperCase();
       if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
-      else if (backendRole === 'ADMIN' || backendRole === 'SUPERADMIN') uiRole = 'admin';
+      else if (backendRole === 'ADMIN') uiRole = 'admin';
+      else if (backendRole === 'SUPERADMIN') uiRole = 'superadmin';
 
       setRole(uiRole);
       setSession({
@@ -130,7 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let uiRole: UserRole = 'user';
         const backendRole = user.role?.toUpperCase();
         if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
-        else if (backendRole === 'ADMIN' || backendRole === 'SUPERADMIN') uiRole = 'admin';
+        else if (backendRole === 'ADMIN') uiRole = 'admin';
+        else if (backendRole === 'SUPERADMIN') uiRole = 'superadmin';
 
         localStorage.removeItem('flexpass-mock-role'); // Remove mock role on success
         setRole(uiRole);

@@ -229,6 +229,14 @@ export const adminService = {
   async getDashboard() {
     const response = await apiClient.get('/admin/dashboard');
     return response.data;
+  },
+  async getUsers() {
+    const response = await apiClient.get('/admin/users');
+    return response.data;
+  },
+  async getAdmins() {
+    const response = await apiClient.get('/admin/admins');
+    return response.data;
   }
 };
 

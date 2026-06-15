@@ -13,15 +13,25 @@ export default function SuperAdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
-      setError('Please enter both username and password.');
+      setError('Please enter both email and password.');
       return;
     }
-    // Log in as super admin and redirect to /superadmin/dashboard
-    loginUser(username, 'superadmin@flexpass.in', 'admin');
-    router.push('/superadmin/dashboard');
+    setError('');
+    // Normalize username to email if it does not contain '@'
+    const emailInput = username.includes('@') ? username : `${username.toLowerCase().replace(/\s+/g, '')}@gmail.com`;
+    const result = await loginUser(emailInput, password);
+    if (result.success) {
+      if (result.role === 'superadmin') {
+        router.push('/superadmin/dashboard');
+      } else {
+        setError('Access denied. Superadmin role required.');
+      }
+    } else {
+      setError(result.message || 'Invalid credentials');
+    }
   };
 
   return (
@@ -54,12 +64,12 @@ export default function SuperAdminLoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-zinc-300 mb-1.5 uppercase">
-                Admin Username
+                Admin Email
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g. superadmin"
+                placeholder="e.g. superadmin@gmail.com"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm focus:outline-brand-primary/50 text-white"

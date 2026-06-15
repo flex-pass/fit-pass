@@ -41,6 +41,10 @@ export default function Navbar() {
           { name: 'HR Dashboard', href: '/corporate/dashboard' },
           { name: 'Employees', href: '/corporate/employees' },
         ];
+      case 'superadmin':
+        return [
+          { name: 'SuperAdmin Home', href: '/superadmin/dashboard' },
+        ];
       case 'admin':
         return [
           { name: 'Admin Home', href: '/admin/dashboard' },

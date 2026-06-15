@@ -13,15 +13,25 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
-      setError('Please enter both username and password.');
+      setError('Please enter both email/username and password.');
       return;
     }
-    // Log in as admin and redirect
-    loginUser(username, 'admin@flexpass.in', 'admin');
-    router.push('/admin/dashboard');
+    setError('');
+    // Normalize username to email if it does not contain '@'
+    const emailInput = username.includes('@') ? username : `${username.toLowerCase().replace(/\s+/g, '')}@gmail.com`;
+    const result = await loginUser(emailInput, password);
+    if (result.success) {
+      if (result.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        setError('Access denied. Admin role required.');
+      }
+    } else {
+      setError(result.message || 'Invalid credentials');
+    }
   };
 
   return (

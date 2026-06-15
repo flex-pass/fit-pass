@@ -26,8 +26,10 @@ export default function LoginPage() {
     setError('');
     const result = await loginUser(emailInput, password);
     if (result.success) {
-      if (result.role === 'admin') {
+      if (result.role === 'superadmin') {
         router.push('/superadmin/dashboard');
+      } else if (result.role === 'admin') {
+        router.push('/admin/dashboard');
       } else if (result.role === 'gym-owner') {
         router.push('/gym-owner/dashboard');
       } else {
