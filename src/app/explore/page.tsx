@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import { mockGyms, Gym } from '@/lib/api';
+import { useGyms } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import GymMap from '@/components/gym-map';
 import { Search, MapPin, Compass } from 'lucide-react';
@@ -10,7 +10,8 @@ import { Search, MapPin, Compass } from 'lucide-react';
 export default function ExploreGymsPage() {
   const { session, role, loginAs } = useAuth();
   const [search, setSearch] = useState('');
-  const [activeGymId, setActiveGymId] = useState<string>('gym-noida-1');
+  const { gyms, loading } = useGyms(28.5355, 77.3910);
+  const [activeGymId, setActiveGymId] = useState<string>('');
 
   if (role !== 'user' || !session) {
     return (
@@ -30,7 +31,7 @@ export default function ExploreGymsPage() {
   }
 
   // Filter gyms based on search
-  const filteredGyms = mockGyms.filter((gym) =>
+  const filteredGyms = gyms.filter((gym) =>
     gym.name.toLowerCase().includes(search.toLowerCase()) || 
     gym.address.toLowerCase().includes(search.toLowerCase())
   );
@@ -68,7 +69,11 @@ export default function ExploreGymsPage() {
           </p>
 
           <div className="space-y-4">
-            {filteredGyms.map((gym) => {
+            {loading ? (
+              <p className="text-sm text-zinc-500">Loading gyms...</p>
+            ) : filteredGyms.length === 0 ? (
+              <p className="text-sm text-zinc-500">No gyms found.</p>
+            ) : filteredGyms.map((gym) => {
               const isActive = gym.id === activeGymId;
               return (
                 <div

@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { mockGyms, mockCheckins } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { useGyms, useCheckins } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import { Wallet, Dumbbell, MapPin, History, RefreshCw, Star } from 'lucide-react';
 
@@ -28,8 +29,11 @@ export default function UserDashboard() {
     );
   }
 
+  const { gyms, loading: gymsLoading } = useGyms(28.5355, 77.3910);
+  const { checkins, loading: checkinsLoading } = useCheckins();
+
   // Display top 2 gyms nearby (first 2 approved gyms)
-  const nearbyGyms = mockGyms.filter(g => !g.kill_switch).slice(0, 2);
+  const nearbyGyms = gyms.filter(g => !g.kill_switch).slice(0, 2);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -108,7 +112,9 @@ export default function UserDashboard() {
         <div className="lg:col-span-5 space-y-6">
           <h3 className="font-extrabold text-xl text-zinc-900 dark:text-white">Recent Check-in Logs</h3>
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm divide-y divide-zinc-150 dark:divide-zinc-800">
-            {mockCheckins.slice(0, 3).map((item) => (
+            {checkinsLoading ? (
+               <div className="p-4 text-sm text-zinc-500">Loading logs...</div>
+            ) : checkins.slice(0, 3).map((item) => (
               <div key={item.id} className="p-4 flex justify-between items-center text-xs">
                 <div className="space-y-1 text-left">
                   <p className="font-bold text-zinc-900 dark:text-zinc-100">{item.gymName}</p>

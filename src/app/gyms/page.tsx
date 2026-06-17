@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { mockGyms, Gym } from '@/lib/api';
+import { useGyms } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import { Search, SlidersHorizontal, MapPin } from 'lucide-react';
 
@@ -9,9 +9,10 @@ export default function GymsDirectory() {
   const [search, setSearch] = useState('');
   const [selectedTier, setSelectedTier] = useState<number | 'all'>('all');
   const [selectedAmenity, setSelectedAmenity] = useState<string | 'all'>('all');
+  const { gyms, loading } = useGyms(28.5355, 77.3910);
 
   // Filter logic
-  const filteredGyms = mockGyms.filter((gym) => {
+  const filteredGyms = gyms.filter((gym) => {
     const matchesSearch = gym.name.toLowerCase().includes(search.toLowerCase()) || 
                           gym.address.toLowerCase().includes(search.toLowerCase());
     const matchesTier = selectedTier === 'all' || gym.tier === selectedTier;
@@ -79,7 +80,11 @@ export default function GymsDirectory() {
       </div>
 
       {/* Grid listing */}
-      {filteredGyms.length > 0 ? (
+      {loading ? (
+        <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/20 border border-zinc-200 dark:border-zinc-800 rounded-2xl">
+          <p className="text-zinc-500 font-medium">Loading partner gyms...</p>
+        </div>
+      ) : filteredGyms.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGyms.map((gym) => (
             <GymCard key={gym.id} gym={gym} />

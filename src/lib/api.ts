@@ -38,101 +38,7 @@ export interface CreditPlan {
   rollover: number;
 }
 
-// Mock Database State
-export const mockGyms: Gym[] = [
-  {
-    id: 'gym-noida-1',
-    name: 'Gold\'s Gym (Sector 62)',
-    address: 'Plot A-40, Sector 62, Noida, UP 201301',
-    latitude: 28.6273,
-    longitude: 77.3725,
-    tier: 1,
-    peak_credit_cost: 10,
-    offpeak_credit_cost: 8,
-    rating: 4.8,
-    distance: '1.2 km',
-    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800',
-    amenities: ['weights', 'cardio', 'pool', 'shower', 'sauna'],
-    peak_hours: '06:00 - 09:00, 18:00 - 21:00',
-    kill_switch: false,
-    is_approved: true,
-  },
-  {
-    id: 'gym-noida-2',
-    name: 'FitLine Fitness Studio (Sector 18)',
-    address: 'Wave Mall, 3rd Floor, Sector 18, Noida, UP 201301',
-    latitude: 28.5708,
-    longitude: 77.3261,
-    tier: 2,
-    peak_credit_cost: 6,
-    offpeak_credit_cost: 4,
-    rating: 4.5,
-    distance: '4.5 km',
-    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=800',
-    amenities: ['weights', 'cardio', 'shower', 'parking'],
-    peak_hours: '07:00 - 10:00, 17:00 - 20:00',
-    kill_switch: false,
-    is_approved: true,
-  },
-  {
-    id: 'gym-noida-3',
-    name: 'The Iron Temple Club (Sector 76)',
-    address: 'Silicon Valley Arcade, Sector 76, Noida, UP 201304',
-    latitude: 28.5672,
-    longitude: 77.3850,
-    tier: 3,
-    peak_credit_cost: 4,
-    offpeak_credit_cost: 2,
-    rating: 4.2,
-    distance: '2.8 km',
-    image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=800',
-    amenities: ['weights', 'cardio', 'shower'],
-    peak_hours: '06:00 - 09:00, 19:00 - 22:00',
-    kill_switch: false,
-    is_approved: true,
-  },
-  {
-    id: 'gym-noida-4',
-    name: 'Breathe Yoga & Pilates Studio (Sector 50)',
-    address: 'Central Plaza, Floor 2, Sector 50, Noida, UP 201301',
-    latitude: 28.5833,
-    longitude: 77.3614,
-    tier: 2, // Boutique
-    peak_credit_cost: 15,
-    offpeak_credit_cost: 12,
-    rating: 4.9,
-    distance: '3.1 km',
-    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&q=80&w=800',
-    amenities: ['shower', 'yoga mat', 'juice bar'],
-    peak_hours: '08:00 - 11:00, 16:00 - 18:00',
-    kill_switch: false,
-    is_approved: true,
-  },
-  {
-    id: 'gym-noida-5',
-    name: 'Champs Boxing & MMA (Sector 137)',
-    address: 'Logix Technica, Tower B, Sector 137, Noida, UP 201305',
-    latitude: 28.5039,
-    longitude: 77.4042,
-    tier: 2,
-    peak_credit_cost: 6,
-    offpeak_credit_cost: 4,
-    rating: 4.7,
-    distance: '8.2 km',
-    image: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&q=80&w=800',
-    amenities: ['ring', 'weights', 'cardio', 'shower'],
-    peak_hours: '06:00 - 09:00, 18:00 - 21:00',
-    kill_switch: true, // Kill Switch ON for demo
-    is_approved: true,
-  }
-];
 
-export const mockCheckins: CheckIn[] = [
-  { id: 'c1', userName: 'Rahul K.', gymName: 'Gold\'s Gym (Sector 62)', time: '9:23 AM', creditsUsed: 4, earnings: 120, status: 'success' },
-  { id: 'c2', userName: 'Priya S.', gymName: 'FitLine Fitness Studio (Sector 18)', time: '11:45 AM', creditsUsed: 4, earnings: 120, status: 'success' },
-  { id: 'c3', userName: 'Amit V.', gymName: 'The Iron Temple Club (Sector 76)', time: '2:10 PM', creditsUsed: 2, earnings: 60, status: 'success' },
-  { id: 'c4', userName: 'Vikash D.', gymName: 'Champs Boxing & MMA (Sector 137)', time: 'Yesterday', creditsUsed: 6, earnings: 180, status: 'fraud' },
-];
 
 export const creditPlans: CreditPlan[] = [
   { id: 'plan-basic', name: 'Basic', price: 1500, credits: 30, costPerCredit: 50, rollover: 30 },
@@ -199,6 +105,10 @@ export const checkinService = {
       qr_token: qrToken
     });
     return response.data;
+  },
+  async getHistory() {
+    const response = await apiClient.get('/checkin/history');
+    return response.data;
   }
 };
 
@@ -224,6 +134,14 @@ export const creditsService = {
 export const adminService = {
   async approveGym(id: string) {
     const response = await apiClient.patch(`/admin/gyms/${id}/approve`);
+    return response.data;
+  },
+  async getPendingGyms() {
+    const response = await apiClient.get('/admin/gyms');
+    return response.data;
+  },
+  async getFraudLogs() {
+    const response = await apiClient.get('/admin/fraud-logs');
     return response.data;
   },
   async getDashboard() {

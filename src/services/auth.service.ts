@@ -21,22 +21,18 @@ export const authService = {
       password: details.password || '123456', // Fallback default password for demo flow
     });
     
-    if (response.data?.success && response.data?.data?.token) {
-      const { token } = response.data.data;
-      localStorage.setItem('flexpass-auth-token', token);
+    if (response.data?.success && response.data?.data?.accessToken) {
+      const { accessToken, user } = response.data.data;
+      localStorage.setItem('flexpass-auth-token', accessToken);
+      localStorage.setItem('flexpass-auth-user', JSON.stringify(user));
       
-      // Fetch user profile from /auth/me API immediately
-      const meResponse = await this.getMe();
-      if (meResponse?.success && meResponse?.data?.user) {
-        localStorage.setItem('flexpass-auth-user', JSON.stringify(meResponse.data.user));
-        return {
-          success: true,
-          data: {
-            token,
-            user: meResponse.data.user
-          }
-        };
-      }
+      return {
+        success: true,
+        data: {
+          token: accessToken,
+          user: user
+        }
+      };
     }
     return response.data;
   },

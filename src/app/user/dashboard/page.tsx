@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
-import { mockGyms, mockCheckins } from '@/lib/api';
+import { useGyms, useCheckins, useCredits } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import GymMap from '@/components/gym-map';
 import QrDisplay from '@/components/qr-display';
@@ -62,6 +62,14 @@ export default function UserDashboard() {
   const [profileCity, setProfileCity] = useState(session?.city || '');
   const [profileSaved, setProfileSaved] = useState(false);
 
+  // API Hooks
+  // We use fallback to Noida coordinates for the nearby gyms query
+  const { gyms, loading: gymsLoading } = useGyms(28.5355, 77.3910);
+  const { checkins, loading: checkinsLoading } = useCheckins();
+  const { balance: apiBalance, loading: creditsLoading, refetch: refetchCredits } = useCredits();
+
+  const currentBalance = creditsLoading ? (session?.creditsBalance || 0) : apiBalance;
+
   // Redirect to home page if not user role
   useEffect(() => {
     if (role !== 'user' || !session) {
@@ -85,9 +93,18 @@ export default function UserDashboard() {
     setTimeout(() => setReferralCopied(false), 2000);
   };
 
-  const handleTopUp = () => {
-    updateCredits(topUpAmount);
-    alert(`Successfully purchased and added ${topUpAmount} Credits to your wallet!`);
+  const handleTopUp = async () => {
+    try {
+      const { creditsService } = await import('@/lib/api');
+      const res = await creditsService.purchaseTopup(topUpAmount);
+      if (res.success) {
+        refetchCredits();
+        updateCredits(topUpAmount); // keep local session in sync
+        alert(`Successfully purchased and added ${topUpAmount} Credits to your wallet!`);
+      }
+    } catch (e) {
+      alert("Failed to purchase credits.");
+    }
   };
 
   const menuItems = [
@@ -203,7 +220,7 @@ export default function UserDashboard() {
             
             <div className="bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary dark:text-cyan-400 text-[11px] font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border border-brand-primary/20">
               <Wallet className="h-3.5 w-3.5" />
-              <span>{session.creditsBalance || 0} Credits</span>
+              <span>{currentBalance} Credits</span>
             </div>
 
             <div className="relative">
@@ -274,7 +291,7 @@ export default function UserDashboard() {
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex items-center justify-between shadow-xs">
                   <div className="space-y-1 text-left">
                     <span className="text-[10px] text-zinc-400 font-bold uppercase block tracking-wider">Credits Remaining</span>
-                    <span className="text-3xl font-extrabold text-brand-primary">{session.creditsBalance || 0} Credits</span>
+                    <span className="text-3xl font-extrabold text-brand-primary">{currentBalance} Credits</span>
                     <span className="text-[10px] text-zinc-500 block">Current plan: {session.planType || 'basic'}</span>
                   </div>
                   <div className="p-3.5 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-xl">
@@ -285,7 +302,7 @@ export default function UserDashboard() {
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl flex items-center justify-between shadow-xs">
                   <div className="space-y-1 text-left">
                     <span className="text-[10px] text-zinc-400 font-bold uppercase block tracking-wider">Total Check-ins</span>
-                    <span className="text-3xl font-extrabold text-zinc-900 dark:text-white">12 Visits</span>
+                    <span className="text-3xl font-extrabold text-zinc-900 dark:text-white">{checkins.length} Visits</span>
                     <span className="text-[10px] text-zinc-500 block">4 visits this calendar month</span>
                   </div>
                   <div className="p-3.5 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-500 rounded-xl">
@@ -310,32 +327,40 @@ export default function UserDashboard() {
                 <div className="lg:col-span-7 space-y-5">
                   <h4 className="font-extrabold text-lg text-zinc-900 dark:text-white text-left">Recommended Gyms near Noida</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {mockGyms.slice(0, 2).map((gym) => (
-                      <GymCard key={gym.id} gym={gym} />
-                    ))}
+                    {gymsLoading ? (
+                      <div className="text-sm text-zinc-500">Loading gyms...</div>
+                    ) : (
+                      gyms.slice(0, 2).map((gym) => (
+                        <GymCard key={gym.id} gym={gym} />
+                      ))
+                    )}
                   </div>
                 </div>
 
                 <div className="lg:col-span-5 space-y-5">
                   <h4 className="font-extrabold text-lg text-zinc-900 dark:text-white text-left">Recent Check-in Logs</h4>
                   <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-xs divide-y divide-zinc-150 dark:divide-zinc-800">
-                    {mockCheckins.slice(0, 3).map((item) => (
-                      <div key={item.id} className="p-4 flex justify-between items-center text-xs">
-                        <div className="space-y-1 text-left">
-                          <p className="font-bold text-zinc-900 dark:text-zinc-100">{item.gymName}</p>
-                          <p className="text-zinc-500 flex items-center gap-1">
-                            <MapPin className="h-3.5 w-3.5 text-zinc-400" />
-                            <span>{session.city || 'Noida'} • {item.time}</span>
-                          </p>
+                    {checkinsLoading ? (
+                      <div className="p-4 text-sm text-zinc-500">Loading checkins...</div>
+                    ) : (
+                      checkins.slice(0, 3).map((item) => (
+                        <div key={item.id} className="p-4 flex justify-between items-center text-xs">
+                          <div className="space-y-1 text-left">
+                            <p className="font-bold text-zinc-900 dark:text-zinc-100">{item.gymName}</p>
+                            <p className="text-zinc-500 flex items-center gap-1">
+                              <MapPin className="h-3.5 w-3.5 text-zinc-400" />
+                              <span>{session.city || 'Noida'} • {item.time}</span>
+                            </p>
+                          </div>
+                          <div className="text-right space-y-1">
+                            <span className="font-bold text-brand-primary block">-{item.creditsUsed} Credits</span>
+                            <span className="inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 font-semibold text-[10px]">
+                              {item.status}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-right space-y-1">
-                          <span className="font-bold text-brand-primary block">-{item.creditsUsed} Credits</span>
-                          <span className="inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 font-semibold text-[10px]">
-                            {item.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -347,16 +372,20 @@ export default function UserDashboard() {
             <div className="space-y-6">
               {/* Map block */}
               <div className="w-full h-[320px] rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm">
-                <GymMap gyms={mockGyms} />
+                <GymMap gyms={gyms} />
               </div>
 
               {/* Gym lists */}
               <div className="space-y-4">
                 <h3 className="font-extrabold text-lg text-zinc-900 dark:text-white text-left">Partner Gym Network</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockGyms.map((gym) => (
-                    <GymCard key={gym.id} gym={gym} />
-                  ))}
+                  {gymsLoading ? (
+                    <div className="col-span-full text-center py-10 text-zinc-500">Finding nearby gyms...</div>
+                  ) : (
+                    gyms.map((gym) => (
+                      <GymCard key={gym.id} gym={gym} />
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -438,19 +467,25 @@ export default function UserDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-150 dark:divide-zinc-800">
-                    {mockCheckins.map((item) => (
-                      <tr key={item.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10">
-                        <td className="p-4 font-bold text-zinc-900 dark:text-zinc-100">{item.gymName}</td>
-                        <td className="p-4 font-semibold text-brand-primary">-{item.creditsUsed} Credits</td>
-                        <td className="p-4 text-zinc-500">{session.city || 'Noida'} NCR</td>
-                        <td className="p-4 text-zinc-500">{item.time}</td>
-                        <td className="p-4">
-                          <span className="inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 font-bold text-[10px] capitalize">
-                            {item.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {checkinsLoading ? (
+                      <tr><td colSpan={5} className="p-8 text-center text-zinc-500">Loading checkin history...</td></tr>
+                    ) : checkins.length === 0 ? (
+                      <tr><td colSpan={5} className="p-8 text-center text-zinc-500">No checkins found.</td></tr>
+                    ) : (
+                      checkins.map((item) => (
+                        <tr key={item.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10">
+                          <td className="p-4 font-bold text-zinc-900 dark:text-zinc-100">{item.gymName}</td>
+                          <td className="p-4 font-semibold text-brand-primary">-{item.creditsUsed} Credits</td>
+                          <td className="p-4 text-zinc-500">{session.city || 'Noida'} NCR</td>
+                          <td className="p-4 text-zinc-500">{item.time}</td>
+                          <td className="p-4">
+                            <span className="inline-flex px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 font-bold text-[10px] capitalize">
+                              {item.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

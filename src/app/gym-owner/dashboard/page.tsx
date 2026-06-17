@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/auth';
-import { mockCheckins } from '@/lib/api';
+import { useCheckins } from '@/lib/hooks';
 import { ToggleLeft, ToggleRight, Dumbbell, ShieldAlert, Award, Calendar, CircleDollarSign } from 'lucide-react';
 
 export default function GymOwnerDashboard() {
   const { session, role, loginAs } = useAuth();
   const [killSwitch, setKillSwitch] = useState(false);
+  const { checkins, loading } = useCheckins();
 
   if (role !== 'gym-owner' || !session) {
     return (
@@ -79,7 +80,7 @@ export default function GymOwnerDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-850 p-5 rounded-2xl space-y-1">
           <span className="text-[10px] text-zinc-400 uppercase block font-semibold">Today Check-ins</span>
-          <span className="text-2xl font-extrabold text-zinc-900 dark:text-white">3 Visits</span>
+          <span className="text-2xl font-extrabold text-zinc-900 dark:text-white">{loading ? '...' : checkins.length} Visits</span>
           <span className="text-[10px] text-emerald-500 block">100% success rate</span>
         </div>
 
@@ -121,7 +122,9 @@ export default function GymOwnerDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-150 dark:divide-zinc-800">
-              {mockCheckins.map((item) => (
+              {loading ? (
+                <tr><td colSpan={5} className="p-8 text-center text-zinc-500">Loading check-ins...</td></tr>
+              ) : checkins.map((item) => (
                 <tr key={item.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10">
                   <td className="p-4 font-semibold text-zinc-500">{item.time}</td>
                   <td className="p-4 font-bold text-zinc-900 dark:text-zinc-100">{item.userName}</td>

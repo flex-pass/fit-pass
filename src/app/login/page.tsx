@@ -15,16 +15,14 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !password) {
+    const trimmedName = name.trim();
+    if (!trimmedName || !password) {
       setError('Please enter both name/email and password.');
       return;
     }
     
-    // Normalize input to email format if it's just a username
-    const emailInput = name.includes('@') ? name : `${name.toLowerCase().replace(/\s+/g, '')}@example.com`;
-    
     setError('');
-    const result = await loginUser(emailInput, password);
+    const result = await loginUser(trimmedName, password);
     if (result.success) {
       if (result.role === 'superadmin') {
         router.push('/superadmin/dashboard');

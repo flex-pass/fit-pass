@@ -1,7 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { mockGyms } from '@/lib/api';
+import { useGym } from '@/lib/hooks';
 import CreditBadge from '@/components/credit-badge';
 import { Dumbbell, MapPin, Clock, ShieldCheck, Heart, Award, ArrowLeft } from 'lucide-react';
 
@@ -9,9 +11,18 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function GymDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const gym = mockGyms.find((g) => g.id === id);
+export default function GymDetailPage({ params }: PageProps) {
+  const unwrappedParams = use(params) as { id: string };
+  const id = unwrappedParams.id;
+  const { gym, loading } = useGym(id);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-zinc-500">
+        Loading Gym Profile...
+      </div>
+    );
+  }
 
   if (!gym) {
     notFound();
@@ -55,7 +66,7 @@ export default async function GymDetailPage({ params }: PageProps) {
           <div className="bg-white dark:bg-zinc-900 border border-zinc-250/50 dark:border-zinc-800 rounded-2xl p-6 space-y-4">
             <h3 className="font-bold text-lg text-zinc-900 dark:text-white">Included Amenities</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {gym.amenities.map((amenity) => (
+              {(gym.amenities || []).map((amenity) => (
                 <div key={amenity} className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
                   <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
                   <span className="capitalize">{amenity}</span>

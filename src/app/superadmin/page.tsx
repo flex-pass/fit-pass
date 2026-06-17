@@ -20,9 +20,7 @@ export default function SuperAdminLoginPage() {
       return;
     }
     setError('');
-    // Normalize username to email if it does not contain '@'
-    const emailInput = username.includes('@') ? username : `${username.toLowerCase().replace(/\s+/g, '')}@gmail.com`;
-    const result = await loginUser(emailInput, password);
+    const result = await loginUser(username, password);
     if (result.success) {
       if (result.role === 'superadmin') {
         router.push('/superadmin/dashboard');

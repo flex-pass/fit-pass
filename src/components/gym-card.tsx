@@ -19,7 +19,8 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
     <div className="bg-white dark:bg-zinc-900 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 transition-all duration-300 hover:shadow-lg hover:border-brand-primary/50 group flex flex-col h-full">
       {/* Gym Photo */}
       <div className="relative h-48 w-full bg-zinc-100 overflow-hidden">
-        {gym.kill_switch && (
+        {/* killSwitch or kill_switch depends on backend vs frontend mapping */}
+        {(gym.killSwitch || gym.kill_switch) && (
           <div className="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center text-center p-4">
             <ShieldAlert className="h-8 w-8 text-amber-500 mb-2 animate-bounce" />
             <p className="text-white font-bold text-sm">Aggregator Traffic Suspended</p>
@@ -27,13 +28,13 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
           </div>
         )}
         <img
-          src={gym.image}
+          src={gym.image || `https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop`}
           alt={gym.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute top-3 left-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
           <Star className="h-3 w-3 fill-amber-500 stroke-amber-500" />
-          <span>{gym.rating}</span>
+          <span>{gym.rating || "4.8"}</span>
         </div>
         <div className="absolute bottom-3 right-3">
           <CreditBadge gym={gym} />
@@ -59,7 +60,7 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
 
           {/* Amenities badges */}
           <div className="flex flex-wrap gap-1 mt-4">
-            {gym.amenities.map(a => (
+            {(gym.amenities || ["Cardio", "Weights"]).map(a => (
               <span key={a} className="text-[10px] uppercase font-semibold tracking-wider bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-300 px-2 py-0.5 rounded-md">
                 {a}
               </span>
@@ -72,13 +73,15 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
           <div className="mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between gap-4">
             <div className="text-xs">
               <span className="text-zinc-400 block">Distance</span>
-              <span className="font-bold text-zinc-800 dark:text-zinc-200">{gym.distance}</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                {gym.distance || (gym as any).distanceMeters ? `${((gym as any).distanceMeters / 1000).toFixed(1)} km` : "Nearby"}
+              </span>
             </div>
             
             <Link
-              href={gym.kill_switch ? '#' : `/gyms/${gym.id}`}
+              href={(gym.killSwitch || gym.kill_switch) ? '#' : `/gyms/${gym.id}`}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all text-center flex items-center gap-1 ${
-                gym.kill_switch
+                (gym.killSwitch || gym.kill_switch)
                   ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'
                   : 'bg-brand-primary text-white hover:bg-brand-secondary'
               }`}

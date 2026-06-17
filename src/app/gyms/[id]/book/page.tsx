@@ -1,16 +1,29 @@
-import React from 'react';
+'use client';
+
+import React, { use } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { mockGyms, getCurrentCreditCost, isPeakHour } from '@/lib/api';
+import { getCurrentCreditCost, isPeakHour } from '@/lib/api';
+import { useGym } from '@/lib/hooks';
 import { ShieldCheck, Dumbbell, ArrowLeft, Zap, Info } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function BookingPage({ params }: PageProps) {
-  const { id } = await params;
-  const gym = mockGyms.find((g) => g.id === id);
+export default function BookingPage({ params }: PageProps) {
+  const unwrappedParams = use(params) as { id: string };
+  const id = unwrappedParams.id;
+  
+  const { gym, loading } = useGym(id);
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
+        Loading...
+      </div>
+    );
+  }
 
   if (!gym) {
     notFound();

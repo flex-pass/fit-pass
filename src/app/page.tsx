@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { mockGyms } from '@/lib/api';
+import { useGyms } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import GymMap from '@/components/gym-map';
 import Hero from '@/components/home/hero';
@@ -15,7 +15,8 @@ export default function LandingPage() {
   const { loginAs } = useAuth();
   
   // Showcase top 3 approved gyms
-  const showcaseGyms = mockGyms.slice(0, 3);
+  const { gyms } = useGyms(28.5355, 77.3910);
+  const showcaseGyms = gyms.slice(0, 3);
 
   const steps = [
     { title: 'Pick a plan', desc: 'Choose a monthly credit balance that fits your schedule.' },
