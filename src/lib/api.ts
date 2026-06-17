@@ -145,7 +145,7 @@ export const adminService = {
     return response.data;
   },
   async getDashboard() {
-    const response = await apiClient.get('/admin/dashboard');
+    const response = await apiClient.get('/admin/analytics/overview');
     return response.data;
   },
   async getUsers() {
@@ -154,6 +154,10 @@ export const adminService = {
   },
   async getAdmins() {
     const response = await apiClient.get('/admin/admins');
+    return response.data;
+  },
+  async getTransactions() {
+    const response = await apiClient.get('/admin/transactions');
     return response.data;
   }
 };

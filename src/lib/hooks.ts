@@ -177,3 +177,51 @@ export function useFraudLogs() {
   return { logs, loading };
 }
 
+export function useUsers() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getUsers();
+        if (res.success) setUsers(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchUsers();
+  }, []);
+  return { users, loading };
+}
+
+export function useAdmins() {
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAdmins();
+        if (res.success) setAdmins(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchAdmins();
+  }, []);
+  return { admins, loading };
+}
+
+export function useTransactions() {
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getTransactions();
+        if (res.success) setTransactions(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchTransactions();
+  }, []);
+  return { transactions, loading };
+}
+

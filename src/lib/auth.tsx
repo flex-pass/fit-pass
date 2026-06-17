@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const backendRole = currentUser.role?.toUpperCase();
       if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
       else if (backendRole === 'ADMIN') uiRole = 'admin';
-      else if (backendRole === 'SUPERADMIN') uiRole = 'superadmin';
+      else if (backendRole === 'SUPER_ADMIN') uiRole = 'superadmin';
 
       setRole(uiRole);
       setSession({
@@ -139,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const backendRole = user.role?.toUpperCase();
         if (backendRole === 'GYM_OWNER') uiRole = 'gym-owner';
         else if (backendRole === 'ADMIN') uiRole = 'admin';
-        else if (backendRole === 'SUPERADMIN') uiRole = 'superadmin';
+        else if (backendRole === 'SUPER_ADMIN') uiRole = 'superadmin';
 
         localStorage.removeItem('flexpass-mock-role'); // Remove mock role on success
         setRole(uiRole);

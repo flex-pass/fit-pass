@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   const { session, role, logout } = useAuth();
   
   // Tab states
-  const [activeTab, setActiveTab] = useState<AdminTabType>('dashboard');
+  const [activeTab, setActiveTab] = useState<AdminTabType>('checkins');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
@@ -105,15 +105,9 @@ export default function AdminDashboard() {
   };
 
   const menuItems = [
-    { id: 'dashboard' as AdminTabType, label: 'Dashboard', icon: BarChart3 },
     { id: 'checkins' as AdminTabType, label: 'Checkins', icon: Activity },
     { id: 'bookings' as AdminTabType, label: 'Bookings', icon: Calendar },
     { id: 'members' as AdminTabType, label: 'Members', icon: Users },
-    { id: 'plans' as AdminTabType, label: 'Plans & Pricing', icon: Sliders },
-    { id: 'passes' as AdminTabType, label: 'Passes and credits', icon: Dumbbell },
-    { id: 'payouts' as AdminTabType, label: 'Payouts', icon: CircleDollarSign },
-    { id: 'profile' as AdminTabType, label: 'Gym Profile', icon: MapPin },
-    { id: 'staff' as AdminTabType, label: 'Staff Management', icon: ShieldCheck },
     { id: 'notification' as AdminTabType, label: 'Notification', icon: Bell },
     { id: 'support' as AdminTabType, label: 'Support', icon: HelpCircle },
     { id: 'settings' as AdminTabType, label: 'Settings', icon: Settings },
@@ -202,9 +196,9 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+            <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
               <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Super Admin</span>
+              <span>Operations Admin</span>
             </div>
 
             <div className="relative">
@@ -249,116 +243,10 @@ export default function AdminDashboard() {
         {/* Panel Wrapper */}
         <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
           
-          {/* TAB: DASHBOARD */}
+          {/* Admin Restricted Notice */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-8">
-              {/* Aggregated Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl space-y-1 text-left shadow-sm">
-                  <span className="text-[10px] text-zinc-400 uppercase block font-semibold">Total GMV</span>
-                  <span className="text-2xl font-extrabold text-zinc-900 dark:text-white">Rs {statsLoading ? '...' : '4,82,000'}</span>
-                  <span className="text-[10px] text-emerald-500 block">+14% vs last month</span>
-                </div>
-
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl space-y-1 text-left shadow-sm">
-                  <span className="text-[10px] text-zinc-400 uppercase block font-semibold">Active Subscriptions</span>
-                  <span className="text-2xl font-extrabold text-brand-primary">{statsLoading ? '...' : stats?.totalUsers || 1248} Users</span>
-                  <span className="text-[10px] text-zinc-500 block">30% breakage percentage</span>
-                </div>
-
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl space-y-1 text-left shadow-sm">
-                  <span className="text-[10px] text-zinc-400 uppercase block font-semibold">Active partner Gyms</span>
-                  <span className="text-2xl font-extrabold text-zinc-900 dark:text-white">{statsLoading ? '...' : stats?.totalGyms || 78} Gyms</span>
-                  <span className="text-[10px] text-zinc-500 block">5 pending approvals</span>
-                </div>
-
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl space-y-1 text-left shadow-sm">
-                  <span className="text-[10px] text-zinc-400 uppercase block font-semibold">Fraud Alerts</span>
-                  <span className="text-2xl font-extrabold text-rose-500">{fraudLogs.length} Triggered</span>
-                  <span className="text-[10px] text-zinc-500 block">p99 scanning speed: 120ms</span>
-                </div>
-              </div>
-
-              {/* Gym Queue & Fraud Alerts */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                <div className="lg:col-span-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm">
-                  <div className="p-5 border-b border-zinc-150 dark:border-zinc-800 flex justify-between items-center">
-                    <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Partner Gym Approval Queue</h3>
-                    <span className="text-xs text-zinc-500">Real-time status</span>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                      <thead>
-                        <tr className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-150 dark:border-zinc-800 text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
-                          <th className="p-4">Gym Name</th>
-                          <th className="p-4">Location</th>
-                          <th className="p-4">Tier Level</th>
-                          <th className="p-4">Registration</th>
-                          <th className="p-4 text-right">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-150 dark:divide-zinc-805">
-                        {gymsLoading ? (
-                           <tr><td colSpan={5} className="p-4 text-zinc-500">Loading pending gyms...</td></tr>
-                        ) : gymList.map((gym) => (
-                          <tr key={gym.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-850/50">
-                            <td className="p-4 font-bold text-zinc-900 dark:text-zinc-100">{gym.name}</td>
-                            <td className="p-4 text-zinc-500 text-xs">{gym.address?.split(',')[1] || gym.address}</td>
-                            <td className="p-4 text-xs">Tier {gym.tier}</td>
-                            <td className="p-4">
-                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                gym.is_approved 
-                                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' 
-                                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-500'
-                              }`}>
-                                {gym.is_approved ? 'Approved' : 'Pending'}
-                              </span>
-                            </td>
-                            <td className="p-4 text-right">
-                              {gym.is_approved ? (
-                                <button
-                                  onClick={() => handleApproveGym(gym.id, false)}
-                                  className="text-rose-500 hover:text-rose-650 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-rose-200 dark:border-rose-900/20 hover:bg-rose-50 dark:hover:bg-rose-950/20 cursor-pointer"
-                                >
-                                  Suspend
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleApproveGym(gym.id, true)}
-                                  className="text-emerald-600 hover:text-emerald-700 font-bold text-[11px] px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-900/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 cursor-pointer"
-                                >
-                                  Approve
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-4 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm space-y-4">
-                  <div className="flex items-center gap-2 text-rose-500 font-bold text-sm">
-                    <AlertOctagon className="h-5 w-5 animate-pulse" />
-                    <span>Fraud Incident Monitor</span>
-                  </div>
-                  <p className="text-zinc-500 text-xs text-left">Flagging duplicate scans or suspicious GPS coordinates checks.</p>
-
-                  <div className="space-y-3 pt-2">
-                    {fraudLogs.map((log) => (
-                      <div key={log.id} className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl space-y-1 text-left text-xs">
-                        <div className="flex justify-between items-center font-bold text-rose-600">
-                          <span>DUPLICATE TOKEN SCAN</span>
-                          <span>{log.time}</span>
-                        </div>
-                        <p className="text-zinc-700 dark:text-zinc-300">User <b>{log.userName}</b> attempted scan twice at {log.gymName}.</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            <div className="p-10 text-center text-zinc-500">
+               Dashboard overview is restricted to Super Admins.
             </div>
           )}
 
@@ -456,152 +344,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* TAB: PLANS & PRICING */}
-          {activeTab === 'plans' && (
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm text-left space-y-6">
-              <div>
-                <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Subscription Plan Tiers</h3>
-                <p className="text-xs text-zinc-500 mt-1">Configure pricing packages and credit quotas for end users.</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {creditPlans.map((plan) => (
-                  <div key={plan.id} className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-5 rounded-2xl space-y-3">
-                    <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-sm capitalize">{plan.name}</h4>
-                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">Active</span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-extrabold text-zinc-900 dark:text-white">₹{plan.price}</span>
-                      <span className="text-[10px] text-zinc-400 uppercase font-bold">/ month</span>
-                    </div>
-                    <div className="text-xs space-y-1.5 pt-2 border-t border-zinc-150 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400">
-                      <p>• {plan.credits} Monthly Credits quota</p>
-                      <p>• ₹{plan.costPerCredit} cost per credit rate</p>
-                      <p>• Max {plan.rollover} credits rollover limit</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB: PASSES AND CREDITS */}
-          {activeTab === 'passes' && (
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm text-left space-y-4">
-              <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Passes & Credits Ledger</h3>
-              <p className="text-xs text-zinc-500">Financial allocation summary of booster packs purchased in current cycle.</p>
-              
-              <div className="space-y-3 pt-2">
-                {[
-                  { name: 'Rahul Kumar', pack: '10 Credits top-up', price: 500, time: '10:14 AM' },
-                  { name: 'Priya Sharma', pack: '50 Credits top-up', price: 2000, time: 'Yesterday' },
-                  { name: 'Amit Verma', pack: '25 Credits top-up', price: 1125, time: '2 days ago' },
-                ].map((item, idx) => (
-                  <div key={idx} className="p-3.5 bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-850 rounded-2xl flex justify-between items-center text-xs">
-                    <div>
-                      <p className="font-bold text-zinc-950 dark:text-white">{item.pack}</p>
-                      <p className="text-zinc-500 text-[10px] mt-0.5">Purchased by: {item.name} • {item.time}</p>
-                    </div>
-                    <span className="font-extrabold text-emerald-600 text-sm">₹{item.price}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB: PAYOUTS */}
-          {activeTab === 'payouts' && (
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm text-left">
-              <div className="p-6 border-b border-zinc-150 dark:border-zinc-800 flex justify-between items-center">
-                <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Gym Owner Payouts</h3>
-                <span className="text-xs text-zinc-550">Billed bi-weekly</span>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                  <thead>
-                    <tr className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-150 dark:border-zinc-800 text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
-                      <th className="p-4">Partner Gym</th>
-                      <th className="p-4">Rating Score</th>
-                      <th className="p-4">Visits Logged</th>
-                      <th className="p-4">Total Revenue</th>
-                      <th className="p-4">Settlement Payout</th>
-                      <th className="p-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-150 dark:divide-zinc-800">
-                    {[
-                      { name: "Gold's Gym (Sector 62)", visits: 45, revenue: 13500, payout: 9450, rating: 4.8, status: 'Settled' },
-                      { name: "FitLine Fitness (Sector 18)", visits: 28, revenue: 8400, payout: 5880, rating: 4.5, status: 'Pending' },
-                      { name: "The Iron Temple (Sector 76)", visits: 19, revenue: 3800, payout: 2660, rating: 4.2, status: 'Pending' },
-                    ].map((gym, idx) => (
-                      <tr key={idx}>
-                        <td className="p-4 font-bold text-zinc-900 dark:text-zinc-100">{gym.name}</td>
-                        <td className="p-4">{gym.rating} ★</td>
-                        <td className="p-4">{gym.visits} checkins</td>
-                        <td className="p-4 font-semibold text-zinc-600 dark:text-zinc-400">Rs {gym.revenue}</td>
-                        <td className="p-4 font-extrabold text-brand-primary">Rs {gym.payout}</td>
-                        <td className="p-4">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            gym.status === 'Settled' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'
-                          }`}>
-                            {gym.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* TAB: PROFILE */}
-          {activeTab === 'profile' && (
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm text-left space-y-4">
-              <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Gym Network Locations</h3>
-              <p className="text-xs text-zinc-500">Configure regional details and locations of partner health club outlets.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {gymList.map((gym) => (
-                  <div key={gym.id} className="p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-850 rounded-2xl flex justify-between items-center text-xs">
-                    <div className="space-y-1">
-                      <p className="font-bold text-zinc-950 dark:text-white">{gym.name}</p>
-                      <p className="text-zinc-450">{gym.address}</p>
-                    </div>
-                    <span className="text-zinc-400 shrink-0 font-bold ml-2">Tier {gym.tier}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* TAB: STAFF MANAGEMENT */}
-          {activeTab === 'staff' && (
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-sm text-left space-y-4">
-              <h3 className="font-extrabold text-base text-zinc-900 dark:text-white">Admin Staff Members</h3>
-              <p className="text-xs text-zinc-500">Directory of administrators with console check-in verification authority.</p>
-              
-              <div className="space-y-3">
-                {[
-                  { name: 'Vikram Singh', role: 'Regional Manager (Noida)', status: 'Active' },
-                  { name: 'Amit Sharma', role: 'Counter Supervisor (Sec 62)', status: 'Active' },
-                  { name: 'Neha Gupta', role: 'Billing Operator', status: 'Offline' },
-                ].map((staff, idx) => (
-                  <div key={idx} className="p-3 bg-zinc-50 dark:bg-zinc-950 border border-zinc-150 dark:border-zinc-850 rounded-2xl flex justify-between items-center text-xs">
-                    <div>
-                      <p className="font-bold text-zinc-950 dark:text-white">{staff.name}</p>
-                      <p className="text-zinc-450 text-[10px] mt-0.5">{staff.role}</p>
-                    </div>
-                    <span className={`text-[10px] font-bold ${staff.status === 'Active' ? 'text-emerald-600' : 'text-zinc-400'}`}>
-                      {staff.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Restricted Tabs Removed */}
 
           {/* TAB: NOTIFICATION */}
           {activeTab === 'notification' && (
