@@ -159,6 +159,34 @@ export const adminService = {
   async getTransactions() {
     const response = await apiClient.get('/admin/transactions');
     return response.data;
+  },
+  async getAllGyms() {
+    const response = await apiClient.get('/admin/gyms/all');
+    return response.data;
+  },
+  async getAllCheckins() {
+    const response = await apiClient.get('/admin/checkins/all');
+    return response.data;
+  },
+  async getAllPayouts() {
+    const response = await apiClient.get('/admin/payouts/all');
+    return response.data;
+  },
+  async getAllPlans() {
+    const response = await apiClient.get('/admin/plans/all');
+    return response.data;
+  },
+  async getAllTickets() {
+    const response = await apiClient.get('/admin/tickets/all');
+    return response.data;
+  },
+  async getAllNotifications() {
+    const response = await apiClient.get('/admin/notifications/all');
+    return response.data;
+  },
+  async getAllRefunds() {
+    const response = await apiClient.get('/admin/refunds/all');
+    return response.data;
   }
 };
 

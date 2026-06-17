@@ -225,3 +225,115 @@ export function useTransactions() {
   return { transactions, loading };
 }
 
+export function useAllGyms() {
+  const [gyms, setGyms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllGyms();
+        if (res.success) setGyms(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { gyms, loading };
+}
+
+export function useAllCheckins() {
+  const [checkins, setCheckins] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllCheckins();
+        if (res.success) setCheckins(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { checkins, loading };
+}
+
+export function useAllPayouts() {
+  const [payouts, setPayouts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllPayouts();
+        if (res.success) setPayouts(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { payouts, loading };
+}
+
+export function useAllPlans() {
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllPlans();
+        if (res.success) setPlans(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { plans, loading };
+}
+
+export function useAllTickets() {
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllTickets();
+        if (res.success) setTickets(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { tickets, loading };
+}
+
+export function useAllNotifications() {
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllNotifications();
+        if (res.success) setNotifications(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { notifications, loading };
+}
+
+export function useAllRefunds() {
+  const [refunds, setRefunds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await adminService.getAllRefunds();
+        if (res.success) setRefunds(res.data);
+      } catch (err) { console.error(err); } finally { setLoading(false); }
+    };
+    fetchData();
+  }, []);
+  return { refunds, loading };
+}
+
