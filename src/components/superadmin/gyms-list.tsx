@@ -28,7 +28,7 @@ export default function GymsList() {
                   <td className="p-3 font-bold text-zinc-900 dark:text-white">{gym.name}</td>
                   <td className="p-3 text-zinc-500">{gym.address}</td>
                   <td className="p-3 text-brand-primary font-bold">Tier {gym.tier}</td>
-                  <td className="p-3 text-zinc-500 capitalize">{gym.status}</td>
+                  <td className="p-3 text-zinc-500 capitalize">{gym.is_approved ? 'Approved' : 'Pending'}</td>
                   <td className="p-3 text-right">
                     <button className="text-brand-primary font-bold hover:underline">Review</button>
                   </td>

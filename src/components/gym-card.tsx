@@ -20,7 +20,7 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
       {/* Gym Photo */}
       <div className="relative h-48 w-full bg-zinc-100 overflow-hidden">
         {/* killSwitch or kill_switch depends on backend vs frontend mapping */}
-        {(gym.killSwitch || gym.kill_switch) && (
+        {((gym as any).killSwitch || gym.kill_switch) && (
           <div className="absolute inset-0 bg-black/60 z-10 flex flex-col items-center justify-center text-center p-4">
             <ShieldAlert className="h-8 w-8 text-amber-500 mb-2 animate-bounce" />
             <p className="text-white font-bold text-sm">Aggregator Traffic Suspended</p>
@@ -79,9 +79,9 @@ export default function GymCard({ gym, showBookBtn = true }: GymCardProps) {
             </div>
             
             <Link
-              href={(gym.killSwitch || gym.kill_switch) ? '#' : `/gyms/${gym.id}`}
+              href={((gym as any).killSwitch || gym.kill_switch) ? '#' : `/gyms/${gym.id}`}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all text-center flex items-center gap-1 ${
-                (gym.killSwitch || gym.kill_switch)
+                ((gym as any).killSwitch || gym.kill_switch)
                   ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'
                   : 'bg-brand-primary text-white hover:bg-brand-secondary'
               }`}

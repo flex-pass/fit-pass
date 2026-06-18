@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
-import { useAuth } from '@/lib/auth';
 import { useGyms, useCheckins } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import { Wallet, Dumbbell, MapPin, History, RefreshCw, Star } from 'lucide-react';
