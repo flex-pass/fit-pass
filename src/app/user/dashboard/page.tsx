@@ -7,6 +7,7 @@ import { useGyms, useCheckins, useCredits } from '@/lib/hooks';
 import GymCard from '@/components/gym-card';
 import GymMap from '@/components/gym-map';
 import QrDisplay from '@/components/qr-display';
+import RazorpayCheckoutButton from '@/components/RazorpayCheckoutButton';
 import { 
   Wallet, 
   Dumbbell, 
@@ -93,19 +94,7 @@ export default function UserDashboard() {
     setTimeout(() => setReferralCopied(false), 2000);
   };
 
-  const handleTopUp = async () => {
-    try {
-      const { creditsService } = await import('@/lib/api');
-      const res = await creditsService.purchaseTopup(topUpAmount);
-      if (res.success) {
-        refetchCredits();
-        updateCredits(topUpAmount); // keep local session in sync
-        alert(`Successfully purchased and added ${topUpAmount} Credits to your wallet!`);
-      }
-    } catch (e) {
-      alert("Failed to purchase credits.");
-    }
-  };
+
 
   const menuItems = [
     { id: 'dashboard' as TabType, label: 'Dashboard', icon: Home },
@@ -574,13 +563,28 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="pt-2">
-                  <button 
-                    onClick={handleTopUp}
+                  <RazorpayCheckoutButton 
+                    amount={
+                      ([
+                        { amount: 10, price: 500 },
+                        { amount: 25, price: 1125 },
+                        { amount: 50, price: 2000 },
+                      ].find(t => t.amount === topUpAmount)?.price || 500) * 100
+                    }
                     className="w-full py-3 bg-brand-primary hover:bg-brand-secondary text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                    onSuccess={() => {
+                      refetchCredits();
+                      updateCredits(topUpAmount);
+                      alert(`Successfully purchased and added ${topUpAmount} Credits to your wallet!`);
+                    }}
+                    onError={(err) => {
+                      console.error('Payment Error:', err);
+                      alert("Payment failed or was cancelled.");
+                    }}
                   >
                     <Plus className="h-4.5 w-4.5" />
                     <span>Purchase {topUpAmount} Credits Now</span>
-                  </button>
+                  </RazorpayCheckoutButton>
                 </div>
               </div>
             </div>

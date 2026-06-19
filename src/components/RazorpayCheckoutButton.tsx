@@ -9,9 +9,10 @@ interface RazorpayCheckoutButtonProps {
   onSuccess?: () => void;
   onError?: (error: any) => void;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export default function RazorpayCheckoutButton({ amount, onSuccess, onError, children }: RazorpayCheckoutButtonProps) {
+export default function RazorpayCheckoutButton({ amount, onSuccess, onError, children, className }: RazorpayCheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const loadRazorpayScript = () => {
@@ -87,7 +88,31 @@ export default function RazorpayCheckoutButton({ amount, onSuccess, onError, chi
           email: user?.email || '',
         },
         theme: {
-          color: '#3399cc',
+          color: '#e11d48',
+        },
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI / QR",
+                instruments: [
+                  { method: "upi" }
+                ]
+              },
+              other: {
+                name: "Other Payment Modes",
+                instruments: [
+                  { method: "card" },
+                  { method: "netbanking" },
+                  { method: "wallet" }
+                ]
+              }
+            },
+            sequence: ["block.upi", "block.other"],
+            preferences: {
+              show_default_blocks: false
+            }
+          }
         },
       };
 
@@ -111,7 +136,7 @@ export default function RazorpayCheckoutButton({ amount, onSuccess, onError, chi
     <button
       onClick={handlePayment}
       disabled={loading}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded disabled:opacity-50"
+      className={className || "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded disabled:opacity-50"}
     >
       {loading ? 'Processing...' : children || `Pay ₹${amount / 100}`}
     </button>
